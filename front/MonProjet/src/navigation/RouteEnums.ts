@@ -5,6 +5,7 @@ export enum Routes {
 
 export enum HomeRoutes {
   HomeScreen = 'HomeScreen',
+  BookmarksScreen = 'BookmarksScreen',
 }
 
 export enum AuthRoutes {

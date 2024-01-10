@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Alert, StyleSheet, Text } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text } from 'react-native';
 import { Input, Layout } from '@ui-kitten/components';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import CustomInput from '../components/TextInput';
@@ -46,9 +46,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     console.log(data);
   }
 
-  const navigateToRegister = () => {
-    navigation.navigate('RegisterScreen');
-  };
+  function navigateToRegister() {
+    navigation.navigate(Routes.AuthRoute, {
+      screen: AuthRoutes.RegisterPage,
+    });
+  }
 
   const passwordRef = useRef<Input>(null);
 
@@ -114,6 +116,21 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           title="Se connecter"
           buttonStyle={{ marginTop: 20 }}
         />
+
+        <Layout
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={styles.missingAccountText}>
+            Vouz navez pas de compte?
+          </Text>
+          <Pressable onPress={navigateToRegister}>
+            <Text style={styles.registerLink}>Créer un compte ici!</Text>
+          </Pressable>
+        </Layout>
       </Layout>
     </Layout>
   );
@@ -137,5 +154,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 5,
+  },
+  missingAccountText: {
+    marginTop: 10,
+    fontSize: 16,
   },
 });

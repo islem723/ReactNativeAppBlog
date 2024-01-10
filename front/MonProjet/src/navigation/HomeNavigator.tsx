@@ -1,17 +1,36 @@
 // navigation/RootNavigator.tsx
 import React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
-import DrawerContent from '../components/DrawerContent';
+
 import { HomeRoutesParamList } from './NavTypes';
 import { HomeRoutes } from './RouteEnums';
+import { BottomNavigation, BottomNavigationTab } from '@ui-kitten/components';
+import BookmarksScreen from '../screens/BookmarksScreen';
 
-const { Navigator, Screen } = createDrawerNavigator<HomeRoutesParamList>();
+const { Navigator, Screen } = createBottomTabNavigator<HomeRoutesParamList>();
+
+interface BottomTabBarProps {
+  navigation: any;
+  state: any;
+}
+
+const BottomTabBar = ({ navigation, state }: BottomTabBarProps) => (
+  <BottomNavigation
+    selectedIndex={state.index}
+    onSelect={(index) => navigation.navigate(state.routeNames[index])}
+  >
+    <BottomNavigationTab title="Home" />
+  </BottomNavigation>
+);
 
 export default function HomeNavigator() {
   return (
-    <Navigator drawerContent={(props) => <DrawerContent {...props} />}>
+    <Navigator
+      tabBar={(props: BottomTabBarProps) => <BottomTabBar {...props} />}
+    >
       <Screen name={HomeRoutes.HomeScreen} component={HomeScreen} />
+      <Screen name={HomeRoutes.BookmarksScreen} component={BookmarksScreen} />
     </Navigator>
   );
 }

@@ -6,6 +6,7 @@ import CustomInput from '../components/TextInput';
 import CustomImageView from '../components/ImageView';
 import CustomButton from '../components/Button';
 import { registerUser } from '../services/ApiService';
+import { Routes, AuthRoutes } from '../navigation/RouteEnums';
 
 //const emailRef = useRef<Input>(null);
 
@@ -42,7 +43,9 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   };
 
   const navigateToLogin = () => {
-    navigation.navigate('LoginScreen');
+    navigation.navigate(Routes.AuthRoute, {
+      screen: AuthRoutes.LoginPage,
+    });
   };
 
   const emailRef = useRef<Input>(null);
