@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet } from 'react-native';
-import { Input, Layout, Text } from '@ui-kitten/components';
+import { Input, Layout, Text, Spinner } from '@ui-kitten/components';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import CustomInput from '../components/TextInput';
 import CustomImageView from '../components/ImageView';
@@ -11,7 +11,7 @@ import { Routes, AuthRoutes } from '../navigation/RouteEnums';
 //const emailRef = useRef<Input>(null);
 
 interface RegisterScreenProps {
-  navigation: any; // Adjust the type based on your navigation prop type
+  navigation: any; // Adjust the type based on navigation prop type
 }
 
 interface FormData {
@@ -21,10 +21,13 @@ interface FormData {
 }
 
 export default function RegisterScreen({ navigation }: RegisterScreenProps) {
+  const [loading, setLoading] = useState(false);
   const { control, handleSubmit } = useForm<FormData>();
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
+      // Show loading indicator
+      setLoading(true);
       const response = await registerUser(data.name, data.email, data.password);
 
       if (response.message) {
@@ -38,6 +41,9 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
         'Registration Failed',
         'An error occurred during registration'
       );
+    } finally {
+      // Hide loading indicator
+      setLoading(false);
     }
     console.log(data);
   };

@@ -1,7 +1,7 @@
 // src/services/ApiService.tsx
 import axios, { AxiosError } from 'axios';
 
-const BASE_URL = 'http://192.168.137.1:3000';
+const BASE_URL = 'http://192.168.1.17:3000';
 
 interface ApiResponse {
   message?: string;

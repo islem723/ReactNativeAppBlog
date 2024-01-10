@@ -1,16 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text } from 'react-native';
-import { Input, Layout } from '@ui-kitten/components';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { Input, Layout, Spinner } from '@ui-kitten/components';
+import { useForm, Controller } from 'react-hook-form';
 import CustomInput from '../components/TextInput';
 import CustomImageView from '../components/ImageView';
 import CustomButton from '../components/Button';
 import { loginUser } from '../services/ApiService';
 import { AuthRoutes, HomeRoutes, Routes } from '../navigation/RouteEnums';
-//import { loginUser } from '../services/ApiService';
 
 interface LoginScreenProps {
-  navigation: any; // Adjust the type based on your navigation prop type
+  navigation: any; // Adjust the type based on navigation prop type
 }
 
 interface FormData {
@@ -19,6 +18,7 @@ interface FormData {
 }
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
+  const [loading, setLoading] = useState(false);
   const {
     control,
     handleSubmit,
@@ -27,7 +27,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
   async function onSubmit(data: FormData) {
     try {
-      // Call your login API or authentication function
+      // Show loading indicator
+      setLoading(true);
+
+      // authentication function
       const response = await loginUser(data.email, data.password);
 
       if (!response.error) {
@@ -42,8 +45,10 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     } catch (error) {
       console.error('Error during login:', error);
       Alert.alert('Login Failed', 'An error occurred during login');
+    } finally {
+      // Hide loading indicator
+      setLoading(false);
     }
-    console.log(data);
   }
 
   function navigateToRegister() {
@@ -116,6 +121,8 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           title="Se connecter"
           buttonStyle={{ marginTop: 20 }}
         />
+
+        {loading && <Spinner size="medium" />}
 
         <Layout
           style={{
