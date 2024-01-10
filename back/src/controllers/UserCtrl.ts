@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
 import IUser from '../types';
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
-import { HASH_ROUNDS, JWT_EXPIRATION, JWT_SECRET } from '../config/env';
+import jwt from 'jsonwebtoken';
+import { JWT_EXPIRATION, JWT_SECRET } from '../config/env';
 import bcrypt from 'bcrypt';
 
 //Register

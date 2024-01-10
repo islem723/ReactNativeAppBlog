@@ -10,6 +10,7 @@ import { AuthRoutes, HomeRoutes, Routes } from '../navigation/RouteEnums';
 
 interface LoginScreenProps {
   navigation: any; // Adjust the type based on navigation prop type
+  error?: boolean;
 }
 
 interface FormData {
@@ -85,6 +86,8 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
               styles={{
                 marginTop: 30,
               }}
+              error={!!errors.email}
+              errorText={errors.email ? 'Your email is invalid!' : ''}
               onSubmitValue={() => passwordRef.current?.focus()}
               placeholder="Email"
               value={field.value}
@@ -95,9 +98,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           defaultValue=""
         />
 
-        {errors.email && <Text>Your email is invalid!</Text>}
-
         <Controller
+          rules={{
+            minLength: 10,
+            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
+          }}
           control={control}
           render={({ field }) => (
             <CustomInput
@@ -105,6 +110,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
               placeholder="Mot de passe"
               secureTextEntry={true}
               returnKeyType={'done'}
+              error={!!errors.password}
+              errorText={
+                errors.password
+                  ? 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one digit.'
+                  : ''
+              }
               value={field.value}
               styles={{
                 marginVertical: 10,
