@@ -4,7 +4,7 @@ export enum Routes {
 }
 
 export enum HomeRoutes {
-  HomeScreen = 'HomeScreen',
+  HomeScreen = 'Articles',
   BookmarksScreen = 'BookmarksScreen',
 }
 

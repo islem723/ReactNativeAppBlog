@@ -12,7 +12,7 @@ export type AuthRoutesParamList = {
 };
 
 export type HomeRoutesParamList = {
-  HomeScreen: undefined;
+  Articles: undefined;
   BookmarksScreen: undefined;
 };
 

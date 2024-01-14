@@ -1,7 +1,7 @@
 // navigation/RootNavigator.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/HomeScreen';
+import Articles from '../screens/HomeScreen';
 
 import { HomeRoutesParamList } from './NavTypes';
 import { HomeRoutes } from './RouteEnums';
@@ -29,7 +29,7 @@ export default function HomeNavigator() {
     <Navigator
       tabBar={(props: BottomTabBarProps) => <BottomTabBar {...props} />}
     >
-      <Screen name={HomeRoutes.HomeScreen} component={HomeScreen} />
+      <Screen name={HomeRoutes.HomeScreen} component={Articles} />
       <Screen name={HomeRoutes.BookmarksScreen} component={BookmarksScreen} />
     </Navigator>
   );

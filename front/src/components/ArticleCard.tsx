@@ -1,15 +1,16 @@
 // components/ArticleCard.tsx
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { BASE_URL } from '../utils/consts';
 import { Article } from '../services/types/types';
-import { Button, Icon } from '@ui-kitten/components';
+import { Layout, Text } from '@ui-kitten/components';
 import { Alert } from 'react-native';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 
 interface ArticleCardProps extends Article {
   onDelete: () => void;
   onBookmark: () => void;
+  onRemoveBookmark: () => void;
   isBookmarked: boolean;
 }
 
@@ -20,14 +21,19 @@ function ArticleCard({
   createdAt,
   onDelete,
   onBookmark,
+  onRemoveBookmark,
   isBookmarked,
 }: ArticleCardProps) {
   const [isBookmarkedLocal, setIsBookmarkedLocal] = useState(isBookmarked);
 
-  const toggleBookmark = () => {
-    setIsBookmarkedLocal(!isBookmarkedLocal);
-    onBookmark();
-  };
+  async function toggleBookmark() {
+    setIsBookmarkedLocal((prev) => (prev = !prev));
+    if (isBookmarkedLocal) {
+      onRemoveBookmark();
+    } else {
+      onBookmark();
+    }
+  }
 
   const formatRelativeTime = (timestamp: string) => {
     const now = new Date();
@@ -69,15 +75,15 @@ function ArticleCard({
   };
 
   return (
-    <View style={styles.card}>
+    <Layout style={styles.card}>
       <Image
         source={{ uri: `${BASE_URL}/img/${image}` }}
         style={styles.image}
       />
-      <View style={styles.content}>
+      <Layout style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.text}>{content}</Text>
-        <View style={styles.row}>
+        <Layout style={styles.row}>
           <Text style={styles.createdAt}>{formatRelativeTime(createdAt)}</Text>
 
           <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
@@ -85,7 +91,7 @@ function ArticleCard({
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bookmarkButton}
-            onPress={toggleBookmark}
+            onPress={async () => await toggleBookmark()}
           >
             <Ionicons
               name={isBookmarkedLocal ? 'bookmarks' : 'bookmarks-outline'}
@@ -94,9 +100,9 @@ function ArticleCard({
             />
           </TouchableOpacity>
           <FontAwesome name="edit" size={22} color="blue" />
-        </View>
-      </View>
-    </View>
+        </Layout>
+      </Layout>
+    </Layout>
   );
 }
 

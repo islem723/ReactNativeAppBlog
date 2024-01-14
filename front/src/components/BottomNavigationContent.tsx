@@ -28,11 +28,6 @@ export default function BottomNavigationContent({
         icon={(props) => <Icon {...props} name="bookmark-outline" />}
         title="Bookmarks"
       />
-      {/* New Tab for Home */}
-      <BottomNavigationTab
-        icon={(props) => <Icon {...props} name="star-outline" />}
-        title="New Tab"
-      />
     </BottomNavigation>
   );
 }

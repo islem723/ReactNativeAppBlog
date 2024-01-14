@@ -85,7 +85,7 @@ export async function deleteArticle(req: Request, res: Response) {
   try {
     const { articleId } = req.params;
 
-    await Article.deleteMany({ _id: articleId });
+    await Article.deleteOne({ _id: articleId });
 
     res.send({ message: 'Article deleted successfully' });
   } catch (error) {
