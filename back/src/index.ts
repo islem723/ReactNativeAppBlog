@@ -16,6 +16,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/user', userRoutes);
 app.use('/article', ArticleRoutes);
 app.use('/userBookmark', UserBookmarkRoutes);
+app.use(
+  '/img',
+  express.static('uploads', {
+    extensions: ['jpg', 'jpeg', 'png', 'gif', 'svg'],
+  }),
+);
 connectDB(() =>
   app.listen(port, () => console.log(`Listening to port: ${port}`)),
 );

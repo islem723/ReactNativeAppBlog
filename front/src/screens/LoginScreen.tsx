@@ -1,5 +1,13 @@
 import React, { useRef, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text } from 'react-native';
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import { Input, Layout, Spinner } from '@ui-kitten/components';
 import { useForm, Controller } from 'react-hook-form';
 import CustomInput from '../components/TextInput';
@@ -10,7 +18,6 @@ import { AuthRoutes, HomeRoutes, Routes } from '../navigation/RouteEnums';
 
 interface LoginScreenProps {
   navigation: any; // Adjust the type based on navigation prop type
-  error?: boolean;
 }
 
 interface FormData {
@@ -27,13 +34,16 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   } = useForm<FormData>();
 
   async function onSubmit(data: FormData) {
+    Keyboard.dismiss();
     try {
       // Show loading indicator
       setLoading(true);
 
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
       // authentication function
       const response = await loginUser(data.email, data.password);
-
+      setLoading(false);
       if (!response.error) {
         Alert.alert('Login Successful');
         navigation.navigate(Routes.HomeRoute, {
@@ -44,11 +54,9 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         Alert.alert('Login Failed', response.error);
       }
     } catch (error) {
+      setLoading(false);
       console.error('Error during login:', error);
       Alert.alert('Login Failed', 'An error occurred during login');
-    } finally {
-      // Hide loading indicator
-      setLoading(false);
     }
   }
 
@@ -61,96 +69,91 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const passwordRef = useRef<Input>(null);
 
   return (
-    <Layout level="1">
-      <Layout level="2" style={styles.loginForm}>
-        <CustomImageView
-          imageUrl={require('../assets/bloglogo.png')}
-          styles={{
-            marginTop: 55,
-            width: 250,
-            height: 170,
-            marginVertical: 10,
-          }}
-        />
-
-        <Controller
-          rules={{
-            minLength: 10,
-            pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-          }}
-          control={control}
-          render={({ field }) => (
-            <CustomInput
-              keyboardType={'email-address'}
-              returnKeyType={'next'}
+    <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView enabled={true}>
+        <Layout level="1">
+          <Layout level="2" style={styles.loginForm}>
+            <CustomImageView
+              imageUrl={require('../assets/bloglogo.png')}
               styles={{
-                marginTop: 30,
-              }}
-              error={!!errors.email}
-              errorText={errors.email ? 'Your email is invalid!' : ''}
-              onSubmitValue={() => passwordRef.current?.focus()}
-              placeholder="Email"
-              value={field.value}
-              onValueChange={(text) => field.onChange(text)}
-            />
-          )}
-          name="email"
-          defaultValue=""
-        />
-
-        <Controller
-          rules={{
-            minLength: 10,
-            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-          }}
-          control={control}
-          render={({ field }) => (
-            <CustomInput
-              inputRef={passwordRef}
-              placeholder="Mot de passe"
-              secureTextEntry={true}
-              returnKeyType={'done'}
-              error={!!errors.password}
-              errorText={
-                errors.password
-                  ? 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one digit.'
-                  : ''
-              }
-              value={field.value}
-              styles={{
+                marginTop: 55,
+                width: 250,
+                height: 170,
                 marginVertical: 10,
               }}
-              onValueChange={(text) => field.onChange(text)}
             />
-          )}
-          name="password"
-          defaultValue=""
-        />
 
-        <CustomButton
-          onPress={handleSubmit(onSubmit)}
-          title="Se connecter"
-          buttonStyle={{ marginTop: 20 }}
-        />
+            <Controller
+              rules={{
+                minLength: 10,
+                pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              }}
+              control={control}
+              render={({ field }) => (
+                <CustomInput
+                  keyboardType={'email-address'}
+                  returnKeyType={'next'}
+                  styles={{
+                    marginTop: 30,
+                  }}
+                  error={!!errors.email}
+                  errorText={errors.email ? 'Invalid email format' : ''}
+                  onSubmitValue={() => passwordRef.current?.focus()}
+                  placeholder="Email"
+                  value={field.value}
+                  onValueChange={(text) => field.onChange(text)}
+                />
+              )}
+              name="email"
+              defaultValue=""
+            />
 
-        {loading && <Spinner size="medium" />}
+            <Controller
+              control={control}
+              rules={{}}
+              render={({ field }) => (
+                <CustomInput
+                  inputRef={passwordRef}
+                  placeholder="Mot de passe"
+                  secureTextEntry={true}
+                  returnKeyType={'done'}
+                  value={field.value}
+                  styles={{
+                    marginVertical: 10,
+                  }}
+                  onValueChange={(text) => field.onChange(text)}
+                />
+              )}
+              name="password"
+              defaultValue=""
+            />
 
-        <Layout
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={styles.missingAccountText}>
-            Vouz navez pas de compte?
-          </Text>
-          <Pressable onPress={navigateToRegister}>
-            <Text style={styles.registerLink}>Créer un compte ici!</Text>
-          </Pressable>
+            <CustomButton
+              onPress={handleSubmit(onSubmit)}
+              title="Se connecter"
+              buttonStyle={{ marginTop: 20 }}
+            />
+
+            {loading && <Spinner size="medium" />}
+
+            <Layout
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Text style={styles.missingAccountText}>
+                Vouz navez pas de compte?
+              </Text>
+              <Pressable onPress={navigateToRegister}>
+                <Text style={styles.registerLink}>Créer un compte ici!</Text>
+              </Pressable>
+            </Layout>
+          </Layout>
         </Layout>
-      </Layout>
-    </Layout>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 

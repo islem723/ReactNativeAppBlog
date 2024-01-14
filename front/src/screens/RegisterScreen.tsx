@@ -22,7 +22,11 @@ interface FormData {
 
 export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const [loading, setLoading] = useState(false);
-  const { control, handleSubmit } = useForm<FormData>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
@@ -71,6 +75,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
         />
 
         <Controller
+          rules={{ pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/ }}
           control={control}
           render={({ field }) => (
             <CustomInput
@@ -91,6 +96,10 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
         />
 
         <Controller
+          rules={{
+            minLength: 10,
+            pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+          }}
           control={control}
           render={({ field }) => (
             <CustomInput
@@ -100,6 +109,8 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
               styles={{
                 marginVertical: 10,
               }}
+              error={!!errors.email}
+              errorText={errors.email ? 'Invalid email format' : ''}
               onSubmitValue={() => passwordRef.current?.focus()}
               placeholder="Email"
               value={field.value}
@@ -111,6 +122,10 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
         />
 
         <Controller
+          rules={{
+            minLength: 8,
+            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
+          }}
           control={control}
           render={({ field }) => (
             <CustomInput
@@ -122,6 +137,12 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
               styles={{
                 marginVertical: 10,
               }}
+              error={!!errors.password}
+              errorText={
+                errors.password
+                  ? 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one digit.'
+                  : ''
+              }
               onValueChange={(text) => field.onChange(text)}
             />
           )}

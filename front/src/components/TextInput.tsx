@@ -1,3 +1,4 @@
+// CustomInput.tsx
 import React, { useState } from 'react';
 import { Input } from '@ui-kitten/components';
 import {
@@ -9,12 +10,14 @@ import {
 } from 'react-native';
 
 interface CustomInputProps {
-  value?: string;
+  value: string;
   inputRef?: any;
   secureTextEntry?: boolean;
   keyboardType?: KeyboardTypeOptions;
   returnKeyType?: ReturnKeyTypeOptions;
   placeholder: string;
+  accessoryRight?: JSX.Element;
+  accessoryLeft?: JSX.Element;
   styles?: StyleProp<TextStyle>;
   onValueChange: (val: string) => void;
   onSubmitValue?: () => void;
@@ -34,6 +37,11 @@ export default function CustomInput(props: CustomInputProps) {
     fontSize: 16,
   };
 
+  const errorStyles: StyleProp<TextStyle> = {
+    ...defaultStyles,
+    borderColor: 'red',
+  };
+
   return (
     <>
       <Input
@@ -43,13 +51,15 @@ export default function CustomInput(props: CustomInputProps) {
         style={[
           defaultStyles,
           props.styles, // User-provided styles
-          props.error && { borderColor: 'red' }, // Highlight border in red if there's an error
+          props.error && errorStyles, // Highlight border in red if there's an error
         ]}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         keyboardType={props.keyboardType}
         returnKeyType={props.returnKeyType}
         value={props.value}
+        accessoryLeft={props.accessoryLeft}
+        accessoryRight={props.accessoryRight}
         onChangeText={props.onValueChange}
         onSubmitEditing={props.onSubmitValue}
         accessibilityLabel={props.placeholder}
@@ -64,5 +74,6 @@ const styles: Record<string, StyleProp<TextStyle>> = {
   errorText: {
     color: 'red',
     marginTop: 5,
+    fontSize: 14,
   },
 };

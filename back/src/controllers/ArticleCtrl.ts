@@ -4,7 +4,7 @@ import IArticle from '../types';
 
 export default async function createArticle(req: Request, res: Response) {
   try {
-    const { content, title, topic, tags, image, owner }: IArticle = req.body;
+    const { content, title, topic, tags, owner }: IArticle = req.body;
 
     const existingArticle = await Article.findOne({ title });
     if (existingArticle) {
@@ -18,7 +18,7 @@ export default async function createArticle(req: Request, res: Response) {
       title,
       topic,
       tags,
-      image,
+      image: `${req.file?.filename}`,
       owner,
     });
 
@@ -74,4 +74,17 @@ export async function UpdateArticle(req: Request, res: Response) {
     message: 'Article updated!',
     product: await Article.findOne({ _id: articleid }),
   });
+}
+
+export async function deleteArticle(req: Request, res: Response) {
+  try {
+    const { articleId } = req.params;
+
+    await Article.deleteMany({ _id: articleId });
+
+    res.send({ message: 'Article deleted successfully' });
+  } catch (error) {
+    console.log('error in deleteCategory', error);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
 }

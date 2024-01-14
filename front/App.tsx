@@ -6,9 +6,11 @@ import { ApplicationProvider } from '@ui-kitten/components';
 
 const App: React.FC = () => {
   return (
-    <ApplicationProvider {...eva} theme={eva.light}>
-      <AppNavigator />
-    </ApplicationProvider>
+    <>
+      <ApplicationProvider {...eva} theme={eva.light}>
+        <AppNavigator />
+      </ApplicationProvider>
+    </>
   );
 };
 

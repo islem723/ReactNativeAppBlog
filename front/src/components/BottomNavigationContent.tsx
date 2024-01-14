@@ -1,4 +1,3 @@
-// components/BottomNavigationContent.tsx
 import React from 'react';
 import {
   BottomNavigation,
@@ -28,6 +27,11 @@ export default function BottomNavigationContent({
       <BottomNavigationTab
         icon={(props) => <Icon {...props} name="bookmark-outline" />}
         title="Bookmarks"
+      />
+      {/* New Tab for Home */}
+      <BottomNavigationTab
+        icon={(props) => <Icon {...props} name="star-outline" />}
+        title="New Tab"
       />
     </BottomNavigation>
   );
