@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Article from '../models/Article';
 import IArticle from '../types';
+import { io } from '../config/server';
 
 export default async function createArticle(req: Request, res: Response) {
   try {
@@ -20,6 +21,10 @@ export default async function createArticle(req: Request, res: Response) {
       tags,
       image: `${req.file?.filename}`,
       owner,
+    });
+
+    io.emit('article_added', {
+      data: 'A new article has been added, check it out!',
     });
 
     res.status(201).json(newArticle);

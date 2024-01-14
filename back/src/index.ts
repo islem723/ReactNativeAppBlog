@@ -6,8 +6,9 @@ import ArticleRoutes from './routes/ArticleRoutes';
 import UserBookmarkRoutes from './routes/UserBookmarksRoutes';
 import morgan from 'morgan';
 import cors from 'cors';
-const app = express();
-const port = 3000;
+import { PORT } from './config/env';
+import { app, http } from './config/server';
+
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use(
     extensions: ['jpg', 'jpeg', 'png', 'gif', 'svg'],
   }),
 );
+
 connectDB(() =>
-  app.listen(port, () => console.log(`Listening to port: ${port}`)),
+  http.listen(PORT, () => console.log(`Listening to port: ${PORT}`)),
 );
