@@ -1,14 +1,14 @@
-import express from "express";
+import express from 'express';
 
 import createBookmark, {
   deleteBookmark,
   getAllfavoriteArticles,
-} from "../controllers/UserBookmarksCtrl";
+} from '../controllers/UserBookmarksCtrl';
 
 const UserBookmarkRoutes = express.Router();
 
-UserBookmarkRoutes.route("/").post(createBookmark).get(getAllfavoriteArticles);
+UserBookmarkRoutes.route('/').post(createBookmark).get(getAllfavoriteArticles);
 
-UserBookmarkRoutes.route("/:bookmarkId").delete(deleteBookmark);
+UserBookmarkRoutes.route('/:userId/:articleId').delete(deleteBookmark);
 
 export default UserBookmarkRoutes;

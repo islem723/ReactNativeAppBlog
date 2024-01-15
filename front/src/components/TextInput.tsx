@@ -32,7 +32,7 @@ export default function CustomInput(props: CustomInputProps) {
     borderColor: isFocused ? '#3498db' : '#B9EDDD',
     borderWidth: 1,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 15,
     borderRadius: 5,
     fontSize: 16,
   };

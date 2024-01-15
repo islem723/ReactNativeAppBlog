@@ -21,6 +21,7 @@ const BottomTabBar = ({ navigation, state }: BottomTabBarProps) => (
     onSelect={(index) => navigation.navigate(state.routeNames[index])}
   >
     <BottomNavigationTab title="Home" />
+    <BottomNavigationTab title="Bookmarks" />
   </BottomNavigation>
 );
 

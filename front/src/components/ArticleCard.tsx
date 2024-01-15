@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { BASE_URL } from '../utils/consts';
-import { Article } from '../services/types/types';
+import { Article } from '../services/types';
 import { Layout, Text } from '@ui-kitten/components';
 import { Alert } from 'react-native';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
@@ -27,7 +27,7 @@ function ArticleCard({
   const [isBookmarkedLocal, setIsBookmarkedLocal] = useState(isBookmarked);
 
   async function toggleBookmark() {
-    setIsBookmarkedLocal((prev) => (prev = !prev));
+    setIsBookmarkedLocal((prev) => !prev);
     if (isBookmarkedLocal) {
       onRemoveBookmark();
     } else {

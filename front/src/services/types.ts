@@ -9,6 +9,8 @@ export interface Article {
   _id: string;
   title: string;
   content: string;
+  topic: string;
+  tags: string[];
   image: string;
   createdAt: string; // Add the actual type of createdAt
   updatedAt: string; // Add the actual type of updatedAt
@@ -28,4 +30,10 @@ export interface UserBookmark {
   _id: string;
   User: User;
   Article: Article;
+}
+
+export interface ImageD {
+  fileName: string;
+  uri: string;
+  fileType: string;
 }

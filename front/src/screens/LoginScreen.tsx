@@ -33,6 +33,8 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     formState: { errors },
   } = useForm<FormData>();
 
+  const passwordRef = useRef<Input>(null);
+
   async function onSubmit(data: FormData) {
     Keyboard.dismiss();
     try {
@@ -65,8 +67,6 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       screen: AuthRoutes.RegisterPage,
     });
   }
-
-  const passwordRef = useRef<Input>(null);
 
   return (
     <TouchableWithoutFeedback style={{ flex: 1 }} onPress={Keyboard.dismiss}>

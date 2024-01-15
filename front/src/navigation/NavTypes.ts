@@ -1,10 +1,5 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
 
-/*
-export type RegisterRoutesParamList = {
-  RegisterPage: undefined;
-};*/
-
 export type AuthRoutesParamList = {
   LoginPage: undefined;
   ForgotPassword: undefined;
@@ -19,4 +14,5 @@ export type HomeRoutesParamList = {
 export type RoutesParamList = {
   AuthRoute: NavigatorScreenParams<AuthRoutesParamList>;
   HomeRoute: NavigatorScreenParams<HomeRoutesParamList>;
+  AddArticleScreen: undefined;
 };

@@ -5,7 +5,7 @@ import { io } from '../config/server';
 
 export default async function createArticle(req: Request, res: Response) {
   try {
-    const { content, title, topic, tags, owner }: IArticle = req.body;
+    const { content, title, topic, owner }: IArticle = req.body;
 
     const existingArticle = await Article.findOne({ title });
     if (existingArticle) {
@@ -14,12 +14,21 @@ export default async function createArticle(req: Request, res: Response) {
         .json({ error: 'Article with the same title already exists' });
     }
 
+    const filename = req.file?.filename;
+
+    /* if (!filename) {
+      return res.status(400).json({ error: 'No image selected!' });
+    }
+    */
+
+    const tags = JSON.parse(req.body.tags as string) as string[];
+
     const newArticle = await Article.create({
       content,
       title,
       topic,
       tags,
-      image: `${req.file?.filename}`,
+      image: filename,
       owner,
     });
 

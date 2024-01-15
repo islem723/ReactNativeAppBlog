@@ -5,7 +5,7 @@ import {
   ApiResponse,
   LoginResponse,
   UserBookmark,
-} from '../services/types/types';
+} from '../services/types';
 import { BASE_URL } from '../utils/consts';
 
 //Register
@@ -64,23 +64,33 @@ export async function deleteArticle(articleId: string): Promise<ApiResponse> {
   }
 }
 //ADD ARTICLE
-export async function Addarticle(
-  content: String,
-  title: String,
-  topic: String,
-  tags: String,
-  image: String,
-  owner: String
-) {
+// ApiService.tsx
+
+interface ArticleData {
+  content: string;
+  title: string;
+  topic: string;
+  tags: string;
+  image: Blob;
+  owner: string;
+}
+
+export async function Addarticle(data: ArticleData): Promise<ApiResponse> {
+  const form = new FormData();
+
+  form.append('content', data.content);
+  form.append('title', data.title);
+  form.append('topic', data.topic);
+  form.append('tags', data.tags);
+  form.append('image', data.image);
+  form.append('owner', data.owner);
+
   try {
-    const response = await axios.post<ApiResponse>(`${BASE_URL}/article`, {
-      content,
-      title,
-      topic,
-      tags,
-      image,
-      owner,
-    });
+    const response = await axios.post<ApiResponse>(
+      `${BASE_URL}/article`,
+      form,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
 
     return response.data;
   } catch (error) {
@@ -88,6 +98,7 @@ export async function Addarticle(
     return { error: `${error}` };
   }
 }
+
 //UPDATE ARTICLE
 export async function updateArticle(
   articleId: string,
@@ -110,7 +121,7 @@ export async function createBookmark(
   articleId: string
 ): Promise<ApiResponse> {
   try {
-    const response = await axios.post<ApiResponse>(`${BASE_URL}/bookmark`, {
+    const response = await axios.post<ApiResponse>(`${BASE_URL}/userBookmark`, {
       userId,
       articleId,
     });
@@ -122,12 +133,12 @@ export async function createBookmark(
 }
 
 // GET ALL FAVORITE ARTICLES
-export async function getAllFavoriteArticles(
+export async function getBookmarkedArticlesForUser(
   userId: string
 ): Promise<UserBookmark[]> {
   try {
     const response = await axios.get<UserBookmark[]>(
-      `${BASE_URL}/bookmark?userId=${userId}`
+      `${BASE_URL}/userBookmark?userId=${userId}`
     );
     return response.data;
   } catch (error) {
@@ -137,10 +148,13 @@ export async function getAllFavoriteArticles(
 }
 
 // DELETE BOOKMARK
-export async function deleteBookmark(bookmarkId: string): Promise<ApiResponse> {
+export async function deleteBookmark(
+  user: string,
+  article: string
+): Promise<ApiResponse> {
   try {
     const response = await axios.delete<ApiResponse>(
-      `${BASE_URL}/bookmark/${bookmarkId}`
+      `${BASE_URL}/userBookmark/${user}/${article}`
     );
     return response.data;
   } catch (error) {
@@ -159,3 +173,4 @@ const handleApiError = (error: AxiosError) => {
     console.error('Error message:', error.message);
   }
 };
+export { UserBookmark };

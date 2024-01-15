@@ -19,7 +19,7 @@ export default async function createBookmark(req: Request, res: Response) {
       Article: articleId,
     });
 
-    return res.status(201).json(newBookmark);
+    return res.status(200).json({ message: 'Bookmark added successfully' });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Failed to create bookmark' });
@@ -33,12 +33,13 @@ export async function getAllfavoriteArticles(req: Request, res: Response) {
   res.status(200).json(favoritearticle);
 }
 
-//delete
 export async function deleteBookmark(req: Request, res: Response) {
   try {
-    const { bookmarkId } = req.params;
-
-    const deletedResult = await UserBookmarks.deleteOne({ _id: bookmarkId });
+    const { userId, articleId } = req.body;
+    const deletedResult = await UserBookmarks.deleteOne({
+      userId,
+      articleId,
+    });
 
     if (!deletedResult.deletedCount) {
       return res.status(404).json({ message: 'Bookmark not found' });

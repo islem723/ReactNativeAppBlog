@@ -1,6 +1,7 @@
 export enum Routes {
   HomeRoute = 'HomeRoute',
   AuthRoute = 'AuthRoute',
+  AddArticleScreen = 'AddArticleScreen',
 }
 
 export enum HomeRoutes {
@@ -14,8 +15,3 @@ export enum AuthRoutes {
   ForgotPassword = 'ForgotPassword',
   RegisterPage = 'RegisterPage',
 }
-
-/*
-export enum RegisterRoutes {
-  RegisterPage = 'RegisterPage',
-}*/

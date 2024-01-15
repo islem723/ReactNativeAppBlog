@@ -1,82 +1,60 @@
 // screens/HomeScreen.tsx
 import React, { useEffect, useState } from 'react';
-import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  Divider,
-  Layout,
-  Text,
-  Input,
-  BottomNavigation,
-  BottomNavigationTab,
-} from '@ui-kitten/components';
+import { FlatList, Pressable, SafeAreaView, StyleSheet } from 'react-native';
+import { Divider, Layout, Text, Input } from '@ui-kitten/components';
 import ArticleCard from '../components/ArticleCard';
 import { getAllArticles, deleteArticle } from '../services/ApiService';
-import { Article } from '../services/types/types';
+import {
+  createBookmark,
+  deleteBookmark,
+  getBookmarkedArticlesForUser,
+} from '../services/ApiService'; // Import bookmark services
+import { Article } from '../services/types';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-root-toast';
-
-import socket from '../services/SocketManager';
+import socket from '../services/SocketManager'; // Import socket from the correct location
 import { HomeRoutes, Routes } from '../navigation/RouteEnums';
-
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { useNavigation } from '@react-navigation/native';
+import { RoutesParamList } from '../navigation/NavTypes';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type NavigationProp = NativeStackNavigationProp<
+  RoutesParamList,
+  Routes.HomeRoute
+>;
+
+export default function HomeScreen() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [bookmarkedArticles, setBookmarkedArticles] = useState<string[]>([]); // Array of bookmarked article IDs
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const navigation = useNavigation<NavigationProp>();
 
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
-
+  async function fetchArticles() {
+    const response = await getAllArticles();
+    setArticles(response);
+  }
   useEffect(() => {
-    async function fetchArticles() {
-      try {
-        const response = await getAllArticles();
-        setArticles(response);
-      } catch (error) {
-        console.error('Error fetching articles:', error);
-      }
-    }
-
     fetchArticles();
   }, []);
 
   useEffect(() => {
     async function askNotification() {
-      // We need to ask for Notification permissions for ios devices
       const { status } = await Notifications.getPermissionsAsync();
       if (Device.isDevice && status === 'granted')
         console.log('Notification permissions granted.');
     }
-
-    // no-op if the socket is already connected
     socket.connect();
-
     askNotification();
-
     return () => {
       socket.disconnect();
     };
   }, []);
 
-  useEffect(function () {
-    function artilce_added_handler(...args: any[]) {
-      // Notifications show only when app is not active.
-      // (ie. another app being used or device's screen is locked)
-
+  useEffect(() => {
+    function articleAddedHandler(...args: any[]) {
       const socketMessage: string = args[0]['data'];
-
       Notifications.scheduleNotificationAsync({
         content: {
           title: 'Article added!',
@@ -95,9 +73,10 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       navigation.navigate(Routes.HomeRoute, {
         screen: HomeRoutes.HomeScreen,
       });
+      //fetchArticles();
     }
 
-    socket.on('article_added', artilce_added_handler);
+    socket.on('article_added', articleAddedHandler);
 
     const listener =
       Notifications.addNotificationReceivedListener(handleNotification);
@@ -108,16 +87,34 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     };
   }, []);
 
+  useEffect(() => {
+    async function fetchBookmarkedArticles() {
+      try {
+        const bookmarkedArticlesResponse = await getBookmarkedArticlesForUser(
+          '659ea6d330cc17c0e305ee6e'
+        );
+        // Extract article IDs from UserBookmark objects
+        const articleIds = bookmarkedArticlesResponse.map(
+          (bookmark) => bookmark.Article._id
+        );
+
+        setBookmarkedArticles(articleIds);
+      } catch (error) {
+        console.error('Error fetching bookmarked articles:', error);
+      }
+    }
+
+    fetchBookmarkedArticles();
+  }, []);
+
   const handleDelete = async (articleId: string) => {
     try {
       const response = await deleteArticle(articleId);
-
       if (response.message !== null) {
         Toast.show(response.message!, {
           duration: Toast.durations.SHORT,
           position: Toast.positions.BOTTOM,
         });
-        // Refresh the article list after deletion
         setArticles(await getAllArticles());
       } else {
         Toast.show(response.error!, {
@@ -131,17 +128,52 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }
   };
 
-  const handleAdd = () => {
-    // Navigate to the screen where you want to add a new article
-    navigation.navigate('YourAddScreen');
+  const handleBookmark = async (articleId: string) => {
+    try {
+      const response = await createBookmark(
+        '659ea6d330cc17c0e305ee6e',
+        articleId
+      );
+      if (response.message !== null) {
+        Toast.show(response.message!, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+        setArticles(await getAllArticles());
+        setBookmarkedArticles([...bookmarkedArticles, articleId]); // Update bookmarkedArticles state
+      } else {
+        Toast.show(response.error!, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+        console.error('Error creating bookmark:', response.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
-  const onSelect = (index: number) => {
-    setSelectedIndex(index);
-
-    // Perform actions based on the selected index if needed
-    if (index === 1) {
-      handleAdd();
+  const handleRemoveBookmark = async (user: string, article: string) => {
+    try {
+      const response = await deleteBookmark(user, article);
+      if (response.message !== null) {
+        Toast.show(response.message!, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+        setArticles(await getAllArticles());
+        setBookmarkedArticles(
+          bookmarkedArticles.filter((id) => id !== article)
+        ); // Update bookmarkedArticles state
+      } else {
+        Toast.show(response.error!, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+        console.error('Error deleting bookmark:', response.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -150,9 +182,9 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Layout style={{ flex: 1, flexDirection: 'column', padding: 10 }}>
         <Layout style={styles.header}>
           <Text category="h4">Explore Articles</Text>
-          <TouchableOpacity onPress={() => console.log('Filter pressed')}>
+          <Pressable onPress={() => console.log('Filter pressed')}>
             <Ionicons name="md-options" size={24} color="black" />
-          </TouchableOpacity>
+          </Pressable>
         </Layout>
 
         <Layout style={styles.searchContainer}>
@@ -167,50 +199,45 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <FlatList
           data={
             !searchTerm.length
-              ? articles
-              : articles.filter((v) =>
-                  v.title.toLowerCase().includes(searchTerm.toLowerCase())
-                )
+              ? articles.map((article) => ({
+                  ...article,
+                  isBookmarked: bookmarkedArticles.includes(article._id),
+                }))
+              : articles
+                  .map((article) => ({
+                    ...article,
+                    isBookmarked: bookmarkedArticles.includes(article._id),
+                  }))
+                  .filter((v) =>
+                    v.title.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
           }
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <ArticleCard
               {...item}
-              isBookmarked={false}
-              onBookmark={() => {
-                Toast.show('Bookmark added !', {
-                  duration: Toast.durations.SHORT,
-                  position: Toast.positions.BOTTOM,
-                });
-              }}
-              onRemoveBookmark={() => {
-                Toast.show('Bookmark removed !', {
-                  duration: Toast.durations.SHORT,
-                  position: Toast.positions.BOTTOM,
-                });
-              }}
-              onDelete={async () => await handleDelete(item._id)}
+              onBookmark={async () => await handleBookmark(item._id)}
+              onRemoveBookmark={async () =>
+                await handleRemoveBookmark('659ea6d330cc17c0e305ee6e', item._id)
+              }
+              onDelete={() => handleDelete(item._id)}
             />
           )}
           ItemSeparatorComponent={() => <Divider />}
           style={{ flex: 1 }}
         />
-
-        {/* Bottom Navigation */}
-        <BottomNavigation
-          selectedIndex={selectedIndex}
-          onSelect={onSelect}
-          appearance="noIndicator"
-          style={styles.bottomNav}
+        <Pressable
+          style={styles.fab}
+          onPress={() => {
+            navigation.navigate(Routes.AddArticleScreen);
+          }}
         >
-          <TouchableOpacity style={styles.fab} onPress={() => {}}>
-            <Ionicons name="add-circle" size={70} color={'blue'} />
-          </TouchableOpacity>
-        </BottomNavigation>
+          <Ionicons name="add-circle" size={70} color={'blue'} />
+        </Pressable>
       </Layout>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   header: {
@@ -246,5 +273,3 @@ const styles = StyleSheet.create({
     },
   },
 });
-
-export default HomeScreen;
